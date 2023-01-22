@@ -1,5 +1,5 @@
 #!/bin/bash
-tableCounFlag=1
+flag=1
 echo "Which Table do you want to insert Data into"
 filecount=$(ls -l | wc -l)
 if [[ $filecount -eq 0 ]]; then
@@ -40,21 +40,29 @@ else
             else
                 whiptail --title "Insert" --msgbox "Wrong Data Type" 8 45
                 echo "Wrong Data Type"
+                let numOfCols=0
+                flag=0
                 cd ..
+                pwd
                 ./connectDB.sh
             fi
-            # test
-            let recsNum=recsNum+1
-            numOfCols=$numOfCols-1
-            #enter data to table file, -n for not going in newline, " " is the delimitter
-            echo -n "$data " >>./$tablename
+            if [[ flag -eq 1 ]]; then
+                echo "Data Inserted fir iteration"
+                let recsNum=recsNum+1
+                numOfCols=$numOfCols-1
+                echo -n "$data " >>./$tablename
+            fi
         done
-        #printing a new line so next value of data get it's own line
-        echo " " >>./$tablename
-        whiptail --title "Insert" --msgbox "Data Inserted" 8 45
-        echo "Data Inserted"
-        cd ..
-        ./connectDB.sh
+        if [[ flag -eq 1 ]]; then
+
+            #printing a new line so next value of data get it's own line
+            echo " " >>./$tablename
+            whiptail --title "Insert" --msgbox "Data Inserted" 8 45
+            echo "Data Inserted"
+            cd ..
+            pwd
+            ./connectDB.sh
+        fi
 
     else
         whiptail --title "Insert" --msgbox "Table does not Exsit" 8 45
