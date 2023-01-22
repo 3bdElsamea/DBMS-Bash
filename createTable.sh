@@ -10,82 +10,68 @@ if [[ $tablename =~ ^[a-zA-Z]+$ ]]; then
         ./connectDB.sh
     else
         echo "Creating the Table"
-        # touch ./$tablename
         touch ./.metaOF$tablename
         echo "Enter the Number of Columns"
         # read colsNum
         colsNum=$(whiptail --title "Create Table" --inputbox "Enter the Number of Columns " 8 45 3>&1 1>&2 2>&3)
-
-        if [[ "$colsNum" =~ ^(1|2|3|4|5|6|7|8|9|10|11|12)$ ]]; then
-            let noc=$colsNum
-            let counter=$noc
-        else
-            whiptail --title "Create Table" --msgbox "Enter a Valid Number of Columns" 8 45
-            echo "Enter a Valid Number of Columns"
-            cd ..
-            ./connectDB.sh
-        fi
-        while ((counter != 0)); do
-            echo "Enter the Columns Name: "
+        let noc=$colsNum
+        counter=1
+        pkFlag=1
+        createFlag=1
+        while [[ counter -le $noc ]]; do
+            echo "Enter the Column Number $counter Name: "
             # read colName
-            colName=$(whiptail --title "Create Table" --inputbox "Enter the Columns Name " 8 45 3>&1 1>&2 2>&3)
+            colName=$(whiptail --title "Create Table" --inputbox "Enter the Column Number $counter Name" 8 45 3>&1 1>&2 2>&3)
             if [[ $colName =~ ^[a-zA-Z]+$ ]]; then
 
                 if [ $(grep "$colName" .metaOF$tablename | wc -l) -eq 1 ]; then
-                    whiptail --title "Create Table" --msgbox "it must be unique!" 8 45
+                    whiptail --title "Create Table" --msgbox "Column Named Must be Unique" 8 45
                     echo "it must be unique!"
-                    rm -r .metaOF$tablename
-                    cd ..
-                    ./connectDB.sh
                 else
                     cn=$colName
                 fi
                 echo "Enter the Data Type (S|s) for string (I|i) for integar):  "
                 # read colDataType
-                colDataType=$(whiptail --title "Create Table" --inputbox "Enter the Data Type (S|s) for string (I|i) for integar) " 8 45 3>&1 1>&2 2>&3)
-                if [[ "$colDataType" =~ ^(S|s)$ ]]; then
-                    cdt=$colDataType
-                elif [[ "$colDataType" =~ ^(I|i)$ ]]; then
-                    cdt=$colDataType
-                else
-                    echo "Enter a Valid Data Type"
-                    whiptail --title "Create Table" --msgbox "Enter a Valid Data Type" 8 45
-                    rm -r .metaOF$tablename
-                    cd ..
-                    ./connectDB.sh
+                colDataType=$(whiptail --title "Data Type Menu " --fb --menu "select Data Type" 15 60 4 \
+                    "1" "Integer" \
+                    "2" "String" \
+                    3>&1 1>&2 2>&3)
+                case $colDataType in
+                1)
+                    cdt="int"
+                    ;;
+                2)
+                    cdt="str"
+                    ;;
+                esac
+                ispk="notpk"
+                if [[ pkFlag -eq 1 ]]; then
+                    echo "is this colums pk? (pk -> if it a primary key /notpk -> if it is not a primary key) "
+                    # read isColPK
+                    isColPK=$(whiptail --title "Check Primary Key" --fb --menu "Is this Col Primary Key" 15 60 4 \
+                        "1" "Yes" \
+                        "2" "no" \
+                        3>&1 1>&2 2>&3)
+                    case $isColPK in
+                    1)
+                        ispk="pk"
+                        pkFlag=0
+                        ;;
+                    2)
+                        ispk="notpk"
+                        ;;
+                    esac
                 fi
-                echo "is this colums pk? (pk -> if it a primary key /notpk -> if it is not a primary key) "
-                # read isColPK
-                isColPK=$(whiptail --title "Create Table" --inputbox "is this colums pk? (pk -> if it a primary key /notpk -> if it is not a primary key)" 8 45 3>&1 1>&2 2>&3)
-
-                if [[ "$isColPK" =~ ^(pk)$ ]]; then
-                    if [ $(grep "pk$" .metaOF$tablename | wc -l) -eq 1 ]; then
-                        whiptail --title "Create Table" --msgbox "there is a PK for this table" 8 45
-                        echo "there is a PK for this table"
-                        rm -r .metaOF$tablename
-                        cd ..
-                        ./connectDB.sh
-                    else
-                        ispk=$isColPK
-                    fi
-                elif [[ "$isColPK" =~ ^(notpk)$ ]]; then
-                    ispk=$isColPK
-                else
-                    whiptail --title "Create Table" --msgbox "Choose a valid Answer" 8 45
-                    echo "Choose a valid Answer"
-                    rm -r .metaOF$tablename
-                    cd ..
-                    ./connectDB.sh
-                fi
-                let counter=counter-1
+                let counter=counter+1
+                echo "$cn:$cdt:$ispk" >>./.metaOF$tablename
+            else
+                whiptail --title "Create Table" --msgbox "Enter a Valid Name for The Column" 8 45
+                echo "Enter a Valid Name for The Column"
             fi
-            #enter metadata
-            echo "$cn:$cdt:$ispk" >>./.metaOF$tablename
         done
-        touch ./$tablename
-        # touch ./.metaOF$tablename
         whiptail --title "Create Table" --msgbox "Table Created Successfully" 8 45
         echo "Table Created Successfully"
+        touch ./$tablename
         cd ..
         ./connectDB.sh
     fi
