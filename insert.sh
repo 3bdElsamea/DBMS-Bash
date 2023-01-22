@@ -70,5 +70,4 @@ else
         cd ..
         ./connectDB.sh
     fi
-
 fi
