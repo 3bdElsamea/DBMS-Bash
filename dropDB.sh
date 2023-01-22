@@ -1,20 +1,15 @@
 #!/bin/bash
-# dirCount=$(find $(pwd) -maxdepth 1 -type d | wc -l)
-# if [[ $dirCount == 1 ]]; then
-#   echo "There is no DB to delete."
-#   . ./run.sh
-# else
-#   echo "Which DB do you want to Delete?"
-#   ls -d */ | cut -f1 -d'/'
-# fi
 
-echo "Enter the DB you want to delete"
-read dbname
+# echo "Enter the DB you want to delete"
+# read dbname
+dbname=$(whiptail --title "Drop Database" --inputbox "Enter Database Name: " 8 45 3>&1 1>&2 2>&3)
 if [[ -d $dbname ]]; then
   rm -r $dbname
-  echo DB Deleted
+  whiptail --title "Drop Databse" --msgbox "DB Deleted Successfully" 8 45
+  echo "DB Deleted"
   ./run.sh
 else
+  whiptail --title "Drop Databse" --msgbox "DB Dosen't Exist" 8 45
   echo "DB dosen't Exist."
   ./run.sh
 fi

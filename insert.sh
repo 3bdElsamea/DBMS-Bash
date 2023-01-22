@@ -9,7 +9,8 @@ else
     ls
 fi
 echo "Enter Table Name to insert into"
-read tablename
+# read tablename
+tablename=$(whiptail --title "Insert" --inputbox "Enter Table Name to insert into" 8 45 3>&1 1>&2 2>&3)
 if [[ -f $tablename ]]; then
     numOfCols=$(sed -n '$=' ./.metaOF$tablename)
     let recsNum=1
@@ -18,11 +19,13 @@ if [[ -f $tablename ]]; then
         colDataType=$(sed -n "$recsNum p" ./.metaOF$tablename | cut -d: -f2)
         isPK=$(sed -n "$recsNum p" ./.metaOF$tablename | cut -d: -f3)
         echo "Enter the  $colName Value | Data Type is $colDataType and is $isPK: "
-        read colData
+        # read colData
+        colData=$(whiptail --title "Insert" --inputbox "Enter the  $colName Value | Data Type is $colDataType and is $isPK: " 8 45 3>&1 1>&2 2>&3)
         #Validate the PK to be Unique
         for i in $(awk '{print $1}' ./$tablename); do
             if [[ "$isPK" =~ ^(pk)$ ]]; then
                 if (($colData == $i)); then
+                    whiptail --title "Insert" --msgbox "PK Must be Unique" 8 45
                     echo "PK Must be Unique"
                     cd ..
                     ./connectDB.sh
@@ -35,6 +38,7 @@ if [[ -f $tablename ]]; then
         elif [[ "$colDataType" =~ ^(S|s)$ && $colData =~ ^[a-zA-Z]+$ ]]; then
             data=$colData
         else
+            whiptail --title "Insert" --msgbox "Wrong Data Type" 8 45
             echo "Wrong Data Type"
             cd ..
             ./connectDB.sh
@@ -46,12 +50,14 @@ if [[ -f $tablename ]]; then
     done
     #printing a new line so next value of data get it's own line
     echo " " >>./$tablename
+    whiptail --title "Insert" --msgbox "Data Inserted" 8 45
     echo "Data Inserted"
     cd ..
     ./connectDB.sh
 
 else
-    echo "Table does not Exsits"
+    whiptail --title "Insert" --msgbox "Table does not Exsit" 8 45
+    echo "Table does not Exsit"
     cd ..
     ./connectDB.sh
 fi
