@@ -43,6 +43,7 @@ else
                 cd ..
                 ./connectDB.sh
             fi
+            # test
             let recsNum=recsNum+1
             numOfCols=$numOfCols-1
             #enter data to table file, -n for not going in newline, " " is the delimitter
