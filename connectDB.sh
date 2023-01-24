@@ -30,7 +30,7 @@ then
 		;;
 		6)./../delete.sh
 		;;
-		7)./../updatetable.sh
+		7)./../updateTable.sh
 		;;
 		8)exit
 		;;
