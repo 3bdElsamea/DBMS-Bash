@@ -5,7 +5,7 @@
 dbMenu=$(whiptail --title "BDMS Menu" --fb --menu "Choose an option" 15 60 4 \
 	"1" "Create Database" \
 	"2" "List Databases" \
-	"3" "Conect to Database" \
+	"3" "Connect to Database" \
 	"4" "Drop Database" \
 	"5" "Exit" 3>&1 1>&2 2>&3)
 case $dbMenu in
